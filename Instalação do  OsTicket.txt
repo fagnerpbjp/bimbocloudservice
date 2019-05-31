@@ -1,0 +1,74 @@
+Install osTticket 1.11 on CENTOS 7
+
+#Instalando a base de pacotes
+yum -y install epel-release*
+sudo yum -y install httpd mariadb mariadb-server php php-mysql php-fpm php-cli php-xml php-common php-gd php-mbstring wget unzip php-opcache php-pecl-apcu php-intl php-imap
+
+#Instalando Mysql/MariaDB
+systemctl start mariadb.service
+systemctl enable mariadb.service 
+mysql_secure_installation
+
+#Configurando MYSQL
+sudo mysql -u root -p
+
+#Configurar tabelas do banco de dados. Você pode alterar qualquer coisa em itelics para se adequar aos seus ids de instalação
+CREATE DATABASE osticket_db;
+CREATE USER 'osticket_user'@'localhost' IDENTIFIED BY 'osticket_password';
+GRANT ALL PRIVILEGES on osticket_db.* TO 'osticket_user'@'localhost' ;
+FLUSH PRIVILEGES;
+EXIT;
+
+#Instalando a ultima versão de fevereiro 2019 do OsTicket através do GITHUB
+cd /tmp/
+wget https://github.com/osTicket/osTicket/releases/download/v1.11/osTicket-v1.11.zip
+
+#Descompactar
+unzip osTicket-v1.11.zip
+
+#Mover para o diretório da web do apache
+sudo mv /tmp/upload /var/www/html/support
+
+#Coloque a permissao
+sudo chown apache: -R /var/www/html/support
+
+#Pré-Instalação do OsTicket configs
+cd /var/www/html/support/
+sudo cp /var/www/html/support/include/ost-sampleconfig.php include/ost-config.php
+
+#Disabilite o SELINUX
+sed -i -r 's/SELINUX=enforcing/SELINUX=disabled/' /etc/selinux/config
+
+#Atualize as Regras de Firewall
+sudo firewall-cmd --zone=public --add-port=80/tcp --permanent
+sudo firewall-cmd --reload
+
+#Este próximo comando é super importante. Isso resolve o erro " atualmente não é possível manipular essa solicitação". 
+Quando você tenta e login para (como do meu teste) acima de 1,9. 
+Se você tiver um nome de local diferente para a instalação do osTicket, apenas altere o caminho do arquivo no comando
+sudo chmod -R 755 /var/www/html/support/
+
+#Definir arquivo de configuração pronto para personalização inicial
+sudo chmod 0666 /var/www/html/support/include/ost-config.php
+service httpd restart
+
+#Teste sua instalação! 
+http://IPofserver/support
+
+#Você deve ver algo como esta tela, tudo deve ser VERDE marcado, então click em continue para continuar.
+
+#Você estará na informação básica do osicket. Esta seção permite que você faça algumas configurações iniciais.
+
+#Configurações de sistema
+#HELP DESK NAME = O nome com o qual este sistema de registro de problemas deve estar associado. Talvez o nome da empresa ou projeto.
+
+#E-mail padrão é o endereço de e-mail que a interação com este sistema de tíquetes usará.
+
+#Configurações do banco de dados
+
+#Depois de concluída a configuração inicial, você verá uma janela.
+
+#Quando você vê a janela, volte para sua CLI e altere os privilégios do arquivo de configuração.
+chmod 0644 /var/www/html/support/include/ost-config.php
+Use as configurações que você configurou ao instalar o maria db
+Depois de concluído, clique em INSTALAR AGORA
