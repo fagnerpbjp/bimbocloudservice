@@ -1,0 +1,40 @@
+//Desativando o SELinux
+
+getenforce
+vim /etc/sysconfig/selinux
+reboot
+
+//Intalando o repositorio do grafana via YUM 
+
+vim /etc/yum.repos.d/grafana.repo
+
+[grafana]
+name=grafana
+baseurl=https://packages.grafana.com/oss/rpm
+repo_gpgcheck=1
+enabled=1
+gpgcheck=1
+gpgkey=https://packages.grafana.com/gpg.key
+sslverify=1
+sslcacert=/etc/pki/tls/certs/ca-bundle.crt
+
+//Instalando grafana
+
+sudo yum install grafana
+
+//Instalando os pacotes adicionais 
+
+yum install fontconfig
+yum install freetype*
+yum install urw-fonts
+
+//Iniciando serviço grafana
+
+systemctl status grafana-server
+systemctl start grafana-server
+systemctl enable grafana-server.service
+
+//Modificando o firewall
+
+firewall-cmd --zone=public --add-port=3000/tcp --permanent
+firewall-cmd --reload
