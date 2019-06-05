@@ -1,0 +1,19 @@
+
+#Instalar o Apache
+
+sudo apt-get update
+sudo apt-get upgrade
+
+sudo apt-get install apache2
+
+
+#Corrigindo problemas na instalação
+
+sudo apt-get install ufw
+
+sudo ufw allow http
+sudo ufw allow https
+
+#Verificando o Status do Apache
+
+sudo systemctl status apache2
